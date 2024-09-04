@@ -6,6 +6,7 @@ pipeline {
         CLIENT_SECRET = '7a91d1c9-2583-4ef6-8907-7c974f1d6a0e'
         APPLICATION_ID = '65e07ecef30e83d820b00d55'
         SCA_API_URL = 'https://appsecops-api.intruceptlabs.com/api/v1/integrations/performSCAScan'
+        SAST_API_URL = 'https://appsecops-api.intruceptlabs.com/api/v1/integrations/performSASTScan'
     }
 
     stages {
@@ -54,26 +55,67 @@ pipeline {
                     ''', returnStdout: true).trim()
 
                     def jsonResponse = readJSON(text: response)
-                    def canProceed = jsonResponse.canProceed
+                    def canProceedSCA = jsonResponse.canProceed
                     def vulnsTable = jsonResponse.vulnsTable
 
                     // Output vulnerabilities and scan result
                     echo "Vulnerabilities found during SCA:"
                     echo vulnsTable
-                    env.CAN_PROCEED = canProceed
+                    env.CAN_PROCEED_SCA = canProceedSCA
                 }
             }
         }
 
         stage('Check SCA Result') {
             when {
-                expression { return env.CAN_PROCEED != 'true' }
+                expression { return env.CAN_PROCEED_SCA != 'true' }
             }
             steps {
                 // Fail the build if SCA scan did not pass
                 error "SCA scan failed. Deployment cancelled."
             }
         }
+
+        stage('Perform SAST Scan') {
+            when {
+                expression { return env.CAN_PROCEED_SCA == 'true' }
+            }
+            steps {
+                script {
+                    // Perform SAST scan using the API
+                    def response = sh(script: '''
+                        curl -X POST \\
+                        -H "Client-ID: $CLIENT_ID" \\
+                        -H "Client-Secret: $CLIENT_SECRET" \\
+                        -F "projectZipFile=@project.zip" \\
+                        -F "applicationId=$APPLICATION_ID" \\
+                        -F "scanName=New SAST Scan from Jenkins Pipeline" \\
+                        -F "language=python" \\
+                        $SAST_API_URL
+                    ''', returnStdout: true).trim()
+
+                    def jsonResponse = readJSON(text: response)
+                    def canProceedSAST = jsonResponse.canProceed
+                    def vulnsTableSAST = jsonResponse.vulnsTable
+
+                    // Output vulnerabilities and scan result
+                    echo "Vulnerabilities found during SAST:"
+                    echo vulnsTableSAST
+                    env.CAN_PROCEED_SAST = canProceedSAST
+                }
+            }
+        }
+
+        stage('Check SAST Result') {
+            when {
+                expression { return env.CAN_PROCEED_SAST != 'true' }
+            }
+            steps {
+                // Fail the build if SAST scan did not pass
+                error "SAST scan failed. Deployment cancelled."
+            }
+        }
+
+        // Additional stages (e.g., deploy) can be added here
     }
 }
-
