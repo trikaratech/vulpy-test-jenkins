@@ -1,0 +1,56 @@
+name: SCA Scan and Deploy to Vercel
+
+on:
+  push:
+    branches: [ main ]  # Adjust this to your main branch name
+
+jobs:
+  sca-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'  # Adjust this to your project's Python version
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Create ZIP file for SCA Scan
+        run: zip -r project.zip . -x '*.git*'
+
+      - name: Perform SCA Scan
+        id: sca
+        run: |
+          RESPONSE=$(curl -X POST \
+            -H "Client-ID: 123e4567-e89b-12d3-a456-426614174001" \
+            -H "Client-Secret: 7a91d1c9-2583-4ef6-8907-7c974f1d6a0e" \
+            -F "projectZipFile=@project.zip" \
+            -F "applicationId=65e07ecef30e83d820b00d55" \
+            -F "scanName=New SCA Scan from API Github actions" \
+            -F "language=python" \
+            https://appsecops-api.intruceptlabs.com/api/v1/integrations/performSCAScan)
+          
+          
+          CAN_PROCEED=$(echo $RESPONSE | jq -r '.canProceed')
+          VULNS_TABLE=$(echo $RESPONSE | jq -r '.vulnsTable')
+          
+          echo "Vulnerabilities found during SCA:"
+          echo "$VULNS_TABLE"
+          
+          echo "canProceed=$CAN_PROCEED" >> $GITHUB_OUTPUT
+
+      - name: Check SCA result
+        if: steps.sca.outputs.canProceed != 'true'
+        run: |
+          echo "SCA scan failed. Deployment cancelled."
+          exit 1
+
+      - name: Deploy to Vercel
+        if: steps.sca.outputs.canProceed == 'true'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          npx vercel --token="${{ secrets.VERCEL_TOKEN }}" --prod --confirm

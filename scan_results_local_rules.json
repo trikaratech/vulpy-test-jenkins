@@ -1,0 +1,1718 @@
+{
+    "errors": [],
+    "interfile_languages_used": [],
+    "paths": {
+        "scanned": ["bad/api_list.py", "bad/api_post.py", "bad/brute.py", "bad/db.py", "bad/db_init.py", "bad/libapi.py", "bad/libmfa.py", "bad/libposts.py", "bad/libsession.py", "bad/libuser.py", "bad/mod_api.py", "bad/mod_csp.py", "bad/mod_hello.py", "bad/mod_mfa.py", "bad/mod_posts.py", "bad/mod_user.py", "bad/vulpy-ssl.py", "bad/vulpy.py", "good/cutpasswd.py", "good/db_init.py", "good/httpbrute.py", "good/libapi.py", "good/libmfa.py", "good/libposts.py", "good/libsession.py", "good/libuser.py", "good/mod_api.py", "good/mod_csp.py", "good/mod_hello.py", "good/mod_mfa.py", "good/mod_posts.py", "good/mod_user.py", "good/mod_welcome1.py", "good/vulpy-ssl.py", "good/vulpy.py", "utils/aes-decrypt.py", "utils/aes-encrypt.py", "utils/ca-create.py", "utils/ca-csr-create.py", "utils/ca-csr-load.py", "utils/crack-cvv.py", "utils/crack-hash.py", "utils/fernet-generate-key.py", "utils/generate_bad_passwords.py", "utils/hashfile.py", "utils/hmac_generate.py", "utils/httpbrute.py", "utils/luncheck.py", "utils/rsa-decrypt.py", "utils/rsa-encrypt.py", "utils/rsa-keygen.py", "utils/rsa-sign.py", "utils/rsa-verify.py", "utils/scrypt-crack.py", "utils/scrypt-generate.py", "utils/scrypt-verify.py", "utils/skey.py"]
+    },
+    "results": [
+        {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.tmpdir.python_tmpdir_rule-hardcodedtmp",
+        "end": {
+            "col": 44,
+            "line": 6,
+            "offset": 99
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "dc1957d91ee4c5fc91272542e60f00a40c63f1bbc503ec8c385d673ef4d47867e1ea2a72cca248c28d62ef0a369423811e528a6ee867778c1fb9630805da1c12_0",
+            "is_ignored": false,
+            "lines": "api_key_file = Path('/tmp/supersecret.txt')",
+            "message": "The application was found creating files in shared system temporary directories\n(`/tmp` or `/var/tmp`) without using the `tempfile.TemporaryFile` function. Depending\non how the application uses this temporary file, an attacker may be able to create\nsymlinks that point to other files prior to the application creating or writing\nto the target file, leading to unintended files being created or overwritten.\n\nExample using `tempfile.TemporaryFile` to write a file:\n```\nimport tempfile\n\n# Open a new temporary file using a context manager\nwith tempfile.TemporaryFile() as fp:\n    # Write some data to the temporary file\n    fp.write(b'Some data')\n    # Seek back to beginning of file\n    fp.seek(0)\n    # Read it\n    data = fp.read()\n# File is automatically closed/removed once we exit the with context\n```\n\nFor more information on alternative tempfile functions see:\n- https://docs.python.org/3/library/tempfile.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-377",
+                "owasp": ["A5:2017-Broken Access Control", "A01:2021-Broken Access Control"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Insecure temporary file"
+            },
+            "metavars": {
+                "$CALL": {
+                    "abstract_content": "Path Path",
+                    "end": {
+                        "col": 20,
+                        "line": 6,
+                        "offset": 75
+                    },
+                    "start": {
+                        "col": 16,
+                        "line": 6,
+                        "offset": 71
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "bad/api_post.py",
+        "start": {
+            "col": 16,
+            "line": 6,
+            "offset": 71
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.requests.python_requests_rule-request-without-timeout",
+        "end": {
+            "col": 108,
+            "line": 16,
+            "offset": 422
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "973072b2eb8704d7f87472074a7e0446d3dcf0ae7a80bb5faf1ca0eaaafaa355de55b075cdb579f210ae45e030dc7f899b8f7e1a8239e729c8241214bde405d4_0",
+            "is_ignored": false,
+            "lines": "        r = requests.post('http://127.0.1.1:5000/api/key', json={'username':username, 'password':password})",
+            "message": "The application was found using the `requests` module without configuring a timeout value for\nconnections. This could lead to uncontrolled resource consumption where the application could\nrun out of\nsocket descriptors, effectively causing a Denial of Service (DoS).\n\nTo remediate this issue, pass in a `timeout=` argument to each `requests` call.\n\nExample using a timeout for an HTTP GET request:\n```\n# Issue a GET request to https://example.com with a timeout of 10 seconds\nresponse = requests.get('https://example.com', timeout=10)\n# Work with the response object\n# ...\n```\n\nFor more information on using the requests module see:\n- https://requests.readthedocs.io/en/latest/api/\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-400",
+                "owasp": ["A6:2017-Security Misconfiguration", "A05:2021-Security Misconfiguration"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Uncontrolled resource consumption"
+            },
+            "metavars": {
+                "$1": {
+                    "abstract_content": "post",
+                    "end": {
+                        "col": 5,
+                        "line": 1,
+                        "offset": 4
+                    },
+                    "start": {
+                        "col": 1,
+                        "line": 1,
+                        "offset": 0
+                    }
+                },
+                "$METHOD": {
+                    "abstract_content": "post",
+                    "end": {
+                        "col": 26,
+                        "line": 16,
+                        "offset": 340
+                    },
+                    "start": {
+                        "col": 22,
+                        "line": 16,
+                        "offset": 336
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "bad/api_post.py",
+        "start": {
+            "col": 13,
+            "line": 16,
+            "offset": 327
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.requests.python_requests_rule-request-without-timeout",
+        "end": {
+            "col": 110,
+            "line": 30,
+            "offset": 904
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "973072b2eb8704d7f87472074a7e0446d3dcf0ae7a80bb5faf1ca0eaaafaa355de55b075cdb579f210ae45e030dc7f899b8f7e1a8239e729c8241214bde405d4_1",
+            "is_ignored": false,
+            "lines": "    r = requests.post('http://127.0.1.1:5000/api/post', json={'text':message}, headers={'X-APIKEY': api_key})",
+            "message": "The application was found using the `requests` module without configuring a timeout value for\nconnections. This could lead to uncontrolled resource consumption where the application could\nrun out of\nsocket descriptors, effectively causing a Denial of Service (DoS).\n\nTo remediate this issue, pass in a `timeout=` argument to each `requests` call.\n\nExample using a timeout for an HTTP GET request:\n```\n# Issue a GET request to https://example.com with a timeout of 10 seconds\nresponse = requests.get('https://example.com', timeout=10)\n# Work with the response object\n# ...\n```\n\nFor more information on using the requests module see:\n- https://requests.readthedocs.io/en/latest/api/\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-400",
+                "owasp": ["A6:2017-Security Misconfiguration", "A05:2021-Security Misconfiguration"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Uncontrolled resource consumption"
+            },
+            "metavars": {
+                "$1": {
+                    "abstract_content": "post",
+                    "end": {
+                        "col": 5,
+                        "line": 1,
+                        "offset": 4
+                    },
+                    "start": {
+                        "col": 1,
+                        "line": 1,
+                        "offset": 0
+                    }
+                },
+                "$METHOD": {
+                    "abstract_content": "post",
+                    "end": {
+                        "col": 22,
+                        "line": 30,
+                        "offset": 816
+                    },
+                    "start": {
+                        "col": 18,
+                        "line": 30,
+                        "offset": 812
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "bad/api_post.py",
+        "start": {
+            "col": 9,
+            "line": 30,
+            "offset": 803
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.sql.python_sql_rule-hardcoded-sql-expression",
+        "end": {
+            "col": 103,
+            "line": 19,
+            "offset": 549
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "d0ce6feb612e6f93571b9649efd5b024a74e2ea01cfe292bfde5734c551c042c3ae4154a83a0b35de7e21f82970a25673500a5c6e6d7c5237dbce9ed8418a783_0",
+            "is_ignored": false,
+            "lines": "        c.execute(\"INSERT INTO users (user, password, failures) VALUES ('%s', '%s', '%d')\" %(u, p, 0))",
+            "message": "SQL Injection is a critical vulnerability that can lead to data or system compromise. By\ndynamically generating SQL query strings, user input may be able to influence the logic of\nthe SQL statement. This could lead to an adversary accessing information they should\nnot have access to, or in some circumstances, being able to execute OS functionality or code.\n\nReplace all dynamically generated SQL queries with parameterized queries. In situations where\ndynamic queries must be created, never use direct user input, but instead use a map or\ndictionary of valid values and resolve them using a user supplied key.\n\nFor example, some database drivers do not allow parameterized queries for `>` or `<` comparison\noperators. In these cases, do not use a user supplied `>` or `<` value, but rather have the\nuser\nsupply a `gt` or `lt` value. The alphabetical values are then used to look up the `>` and `<`\nvalues to be used in the construction of the dynamic query. The same goes for other queries\nwhere\ncolumn or table names are required but cannot be parameterized.\n\nExample using `PreparedStatement` queries:\n```\nimport sqlite3\n\n# Create a new database (in memory)\ncon = sqlite3.connect(\":memory:\")\n# Get a cursor from the connection\ncur = con.cursor()\n# Create a tuple of the value to be used in the parameterized query\nparams = ('user-input',)\n# execute the statement, passing in the params for the value\ncur.execute(\"select name from sqlite_master where name = ?\", params)\n# work with the result\nresult = cur.fetchall()\n```\n\nFor more information on SQL Injection see OWASP:\nhttps://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-89",
+                "owasp": ["A1:2017-Injection", "A03:2021-Injection"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Improper neutralization of special elements used in an SQL Command ('SQL Injection')"
+            },
+            "metavars": {
+                "$1": {
+                    "abstract_content": "INSERT",
+                    "end": {
+                        "col": 7,
+                        "line": 1,
+                        "offset": 6
+                    },
+                    "start": {
+                        "col": 1,
+                        "line": 1,
+                        "offset": 0
+                    }
+                },
+                "$DB": {
+                    "abstract_content": "c",
+                    "end": {
+                        "col": 10,
+                        "line": 19,
+                        "offset": 456
+                    },
+                    "start": {
+                        "col": 9,
+                        "line": 19,
+                        "offset": 455
+                    }
+                },
+                "$QUERY": {
+                    "abstract_content": "INSERT INTO users (user, password, failures) VALUES ('%s', '%s', '%d')",
+                    "end": {
+                        "col": 90,
+                        "line": 19,
+                        "offset": 536
+                    },
+                    "start": {
+                        "col": 20,
+                        "line": 19,
+                        "offset": 466
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "bad/db.py",
+        "start": {
+            "col": 9,
+            "line": 19,
+            "offset": 455
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.sql.python_sql_rule-hardcoded-sql-expression",
+        "end": {
+            "col": 151,
+            "line": 20,
+            "offset": 545
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "7cda07e4981c906011580cbb74d4eb5cf21ec283666d553eb02dbe897a86d5db8c8dc52b0b6d2e2f41d6c7eb9242aa95352f49ec74b0a480264774f517349f99_0",
+            "is_ignored": false,
+            "lines": "        c.execute(\"INSERT INTO users (username, password, failures, mfa_enabled, mfa_secret) VALUES ('%s', '%s', '%d', '%d', '%s')\" %(u, p, 0, 0, ''))",
+            "message": "SQL Injection is a critical vulnerability that can lead to data or system compromise. By\ndynamically generating SQL query strings, user input may be able to influence the logic of\nthe SQL statement. This could lead to an adversary accessing information they should\nnot have access to, or in some circumstances, being able to execute OS functionality or code.\n\nReplace all dynamically generated SQL queries with parameterized queries. In situations where\ndynamic queries must be created, never use direct user input, but instead use a map or\ndictionary of valid values and resolve them using a user supplied key.\n\nFor example, some database drivers do not allow parameterized queries for `>` or `<` comparison\noperators. In these cases, do not use a user supplied `>` or `<` value, but rather have the\nuser\nsupply a `gt` or `lt` value. The alphabetical values are then used to look up the `>` and `<`\nvalues to be used in the construction of the dynamic query. The same goes for other queries\nwhere\ncolumn or table names are required but cannot be parameterized.\n\nExample using `PreparedStatement` queries:\n```\nimport sqlite3\n\n# Create a new database (in memory)\ncon = sqlite3.connect(\":memory:\")\n# Get a cursor from the connection\ncur = con.cursor()\n# Create a tuple of the value to be used in the parameterized query\nparams = ('user-input',)\n# execute the statement, passing in the params for the value\ncur.execute(\"select name from sqlite_master where name = ?\", params)\n# work with the result\nresult = cur.fetchall()\n```\n\nFor more information on SQL Injection see OWASP:\nhttps://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-89",
+                "owasp": ["A1:2017-Injection", "A03:2021-Injection"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Improper neutralization of special elements used in an SQL Command ('SQL Injection')"
+            },
+            "metavars": {
+                "$1": {
+                    "abstract_content": "INSERT",
+                    "end": {
+                        "col": 7,
+                        "line": 1,
+                        "offset": 6
+                    },
+                    "start": {
+                        "col": 1,
+                        "line": 1,
+                        "offset": 0
+                    }
+                },
+                "$DB": {
+                    "abstract_content": "c",
+                    "end": {
+                        "col": 10,
+                        "line": 20,
+                        "offset": 404
+                    },
+                    "start": {
+                        "col": 9,
+                        "line": 20,
+                        "offset": 403
+                    }
+                },
+                "$QUERY": {
+                    "abstract_content": "INSERT INTO users (username, password, failures, mfa_enabled, mfa_secret) VALUES ('%s', '%s', '%d', '%d', '%s')",
+                    "end": {
+                        "col": 131,
+                        "line": 20,
+                        "offset": 525
+                    },
+                    "start": {
+                        "col": 20,
+                        "line": 20,
+                        "offset": 414
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "bad/db_init.py",
+        "start": {
+            "col": 9,
+            "line": 20,
+            "offset": 403
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.tmpdir.python_tmpdir_rule-hardcodedtmp",
+        "end": {
+            "col": 27,
+            "line": 16,
+            "offset": 306
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "8f5de8f667d6c33faeab479a62275d2e3faebdd2baee4c49bb953d31ccad73186d7613b00b0f3a369005b3f67b2ce38d844865c949793a11879740f7959862ce_0",
+            "is_ignored": false,
+            "lines": "    for f in Path('/tmp/').glob('vulpy.apikey.' + username + '.*'):",
+            "message": "The application was found creating files in shared system temporary directories\n(`/tmp` or `/var/tmp`) without using the `tempfile.TemporaryFile` function. Depending\non how the application uses this temporary file, an attacker may be able to create\nsymlinks that point to other files prior to the application creating or writing\nto the target file, leading to unintended files being created or overwritten.\n\nExample using `tempfile.TemporaryFile` to write a file:\n```\nimport tempfile\n\n# Open a new temporary file using a context manager\nwith tempfile.TemporaryFile() as fp:\n    # Write some data to the temporary file\n    fp.write(b'Some data')\n    # Seek back to beginning of file\n    fp.seek(0)\n    # Read it\n    data = fp.read()\n# File is automatically closed/removed once we exit the with context\n```\n\nFor more information on alternative tempfile functions see:\n- https://docs.python.org/3/library/tempfile.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-377",
+                "owasp": ["A5:2017-Broken Access Control", "A01:2021-Broken Access Control"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Insecure temporary file"
+            },
+            "metavars": {
+                "$CALL": {
+                    "abstract_content": "Path Path",
+                    "end": {
+                        "col": 18,
+                        "line": 16,
+                        "offset": 297
+                    },
+                    "start": {
+                        "col": 14,
+                        "line": 16,
+                        "offset": 293
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "bad/libapi.py",
+        "start": {
+            "col": 14,
+            "line": 16,
+            "offset": 293
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.tmpdir.python_tmpdir_rule-hardcodedtmp",
+        "end": {
+            "col": 27,
+            "line": 33,
+            "offset": 659
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "8f5de8f667d6c33faeab479a62275d2e3faebdd2baee4c49bb953d31ccad73186d7613b00b0f3a369005b3f67b2ce38d844865c949793a11879740f7959862ce_1",
+            "is_ignored": false,
+            "lines": "    for f in Path('/tmp/').glob('vulpy.apikey.*.' + key):",
+            "message": "The application was found creating files in shared system temporary directories\n(`/tmp` or `/var/tmp`) without using the `tempfile.TemporaryFile` function. Depending\non how the application uses this temporary file, an attacker may be able to create\nsymlinks that point to other files prior to the application creating or writing\nto the target file, leading to unintended files being created or overwritten.\n\nExample using `tempfile.TemporaryFile` to write a file:\n```\nimport tempfile\n\n# Open a new temporary file using a context manager\nwith tempfile.TemporaryFile() as fp:\n    # Write some data to the temporary file\n    fp.write(b'Some data')\n    # Seek back to beginning of file\n    fp.seek(0)\n    # Read it\n    data = fp.read()\n# File is automatically closed/removed once we exit the with context\n```\n\nFor more information on alternative tempfile functions see:\n- https://docs.python.org/3/library/tempfile.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-377",
+                "owasp": ["A5:2017-Broken Access Control", "A01:2021-Broken Access Control"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Insecure temporary file"
+            },
+            "metavars": {
+                "$CALL": {
+                    "abstract_content": "Path Path",
+                    "end": {
+                        "col": 18,
+                        "line": 33,
+                        "offset": 650
+                    },
+                    "start": {
+                        "col": 14,
+                        "line": 33,
+                        "offset": 646
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "bad/libapi.py",
+        "start": {
+            "col": 14,
+            "line": 33,
+            "offset": 646
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.sql.python_sql_rule-hardcoded-sql-expression",
+        "end": {
+            "col": 113,
+            "line": 12,
+            "offset": 315
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "f32b559301f6296359c7b417e19466d2ee002725398785e09fd4cf8037f327fdde646c3cf70eeaeea21d98a3b82cd2c3320f886e6cca47ba88a81c405bdd6c34_0",
+            "is_ignored": false,
+            "lines": "    user = c.execute(\"SELECT * FROM users WHERE username = '{}' and password = '{}'\".format(username, password)).fetchone()",
+            "message": "SQL Injection is a critical vulnerability that can lead to data or system compromise. By\ndynamically generating SQL query strings, user input may be able to influence the logic of\nthe SQL statement. This could lead to an adversary accessing information they should\nnot have access to, or in some circumstances, being able to execute OS functionality or code.\n\nReplace all dynamically generated SQL queries with parameterized queries. In situations where\ndynamic queries must be created, never use direct user input, but instead use a map or\ndictionary of valid values and resolve them using a user supplied key.\n\nFor example, some database drivers do not allow parameterized queries for `>` or `<` comparison\noperators. In these cases, do not use a user supplied `>` or `<` value, but rather have the\nuser\nsupply a `gt` or `lt` value. The alphabetical values are then used to look up the `>` and `<`\nvalues to be used in the construction of the dynamic query. The same goes for other queries\nwhere\ncolumn or table names are required but cannot be parameterized.\n\nExample using `PreparedStatement` queries:\n```\nimport sqlite3\n\n# Create a new database (in memory)\ncon = sqlite3.connect(\":memory:\")\n# Get a cursor from the connection\ncur = con.cursor()\n# Create a tuple of the value to be used in the parameterized query\nparams = ('user-input',)\n# execute the statement, passing in the params for the value\ncur.execute(\"select name from sqlite_master where name = ?\", params)\n# work with the result\nresult = cur.fetchall()\n```\n\nFor more information on SQL Injection see OWASP:\nhttps://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-89",
+                "owasp": ["A1:2017-Injection", "A03:2021-Injection"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Improper neutralization of special elements used in an SQL Command ('SQL Injection')"
+            },
+            "metavars": {
+                "$1": {
+                    "abstract_content": "SELECT",
+                    "end": {
+                        "col": 7,
+                        "line": 1,
+                        "offset": 6
+                    },
+                    "start": {
+                        "col": 1,
+                        "line": 1,
+                        "offset": 0
+                    }
+                },
+                "$DB": {
+                    "abstract_content": "c",
+                    "end": {
+                        "col": 13,
+                        "line": 12,
+                        "offset": 215
+                    },
+                    "propagated_value": {
+                        "svalue_abstract_content": "conn.cursor()",
+                        "svalue_end": {
+                            "col": 22,
+                            "line": 10,
+                            "offset": 201
+                        },
+                        "svalue_start": {
+                            "col": 9,
+                            "line": 10,
+                            "offset": 188
+                        }
+                    },
+                    "start": {
+                        "col": 12,
+                        "line": 12,
+                        "offset": 214
+                    }
+                },
+                "$QUERY": {
+                    "abstract_content": "SELECT * FROM users WHERE username = '{}' and password = '{}'",
+                    "end": {
+                        "col": 84,
+                        "line": 12,
+                        "offset": 286
+                    },
+                    "start": {
+                        "col": 23,
+                        "line": 12,
+                        "offset": 225
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "bad/libuser.py",
+        "start": {
+            "col": 12,
+            "line": 12,
+            "offset": 214
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.sql.python_sql_rule-hardcoded-sql-expression",
+        "end": {
+            "col": 161,
+            "line": 25,
+            "offset": 668
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "19bd08083c1ca89e1572dd072da9e525bfd5e7486bf98964614f53a1df6d5265876c2c45a31ef37447404119f834ee56045054b9a62153aeead114081fa990df_0",
+            "is_ignored": false,
+            "lines": "    c.execute(\"INSERT INTO users (username, password, failures, mfa_enabled, mfa_secret) VALUES ('%s', '%s', '%d', '%d', '%s')\" %(username, password, 0, 0, ''))",
+            "message": "SQL Injection is a critical vulnerability that can lead to data or system compromise. By\ndynamically generating SQL query strings, user input may be able to influence the logic of\nthe SQL statement. This could lead to an adversary accessing information they should\nnot have access to, or in some circumstances, being able to execute OS functionality or code.\n\nReplace all dynamically generated SQL queries with parameterized queries. In situations where\ndynamic queries must be created, never use direct user input, but instead use a map or\ndictionary of valid values and resolve them using a user supplied key.\n\nFor example, some database drivers do not allow parameterized queries for `>` or `<` comparison\noperators. In these cases, do not use a user supplied `>` or `<` value, but rather have the\nuser\nsupply a `gt` or `lt` value. The alphabetical values are then used to look up the `>` and `<`\nvalues to be used in the construction of the dynamic query. The same goes for other queries\nwhere\ncolumn or table names are required but cannot be parameterized.\n\nExample using `PreparedStatement` queries:\n```\nimport sqlite3\n\n# Create a new database (in memory)\ncon = sqlite3.connect(\":memory:\")\n# Get a cursor from the connection\ncur = con.cursor()\n# Create a tuple of the value to be used in the parameterized query\nparams = ('user-input',)\n# execute the statement, passing in the params for the value\ncur.execute(\"select name from sqlite_master where name = ?\", params)\n# work with the result\nresult = cur.fetchall()\n```\n\nFor more information on SQL Injection see OWASP:\nhttps://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-89",
+                "owasp": ["A1:2017-Injection", "A03:2021-Injection"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Improper neutralization of special elements used in an SQL Command ('SQL Injection')"
+            },
+            "metavars": {
+                "$1": {
+                    "abstract_content": "INSERT",
+                    "end": {
+                        "col": 7,
+                        "line": 1,
+                        "offset": 6
+                    },
+                    "start": {
+                        "col": 1,
+                        "line": 1,
+                        "offset": 0
+                    }
+                },
+                "$DB": {
+                    "abstract_content": "c",
+                    "end": {
+                        "col": 6,
+                        "line": 25,
+                        "offset": 513
+                    },
+                    "propagated_value": {
+                        "svalue_abstract_content": "conn.cursor()",
+                        "svalue_end": {
+                            "col": 22,
+                            "line": 23,
+                            "offset": 506
+                        },
+                        "svalue_start": {
+                            "col": 9,
+                            "line": 23,
+                            "offset": 493
+                        }
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 25,
+                        "offset": 512
+                    }
+                },
+                "$QUERY": {
+                    "abstract_content": "INSERT INTO users (username, password, failures, mfa_enabled, mfa_secret) VALUES ('%s', '%s', '%d', '%d', '%s')",
+                    "end": {
+                        "col": 127,
+                        "line": 25,
+                        "offset": 634
+                    },
+                    "start": {
+                        "col": 16,
+                        "line": 25,
+                        "offset": 523
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "bad/libuser.py",
+        "start": {
+            "col": 5,
+            "line": 25,
+            "offset": 512
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.sql.python_sql_rule-hardcoded-sql-expression",
+        "end": {
+            "col": 99,
+            "line": 53,
+            "offset": 1301
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "bf4e1828ba345074d7d25a49b16b07b04b785e7300974521af3d9711c67d809cb4117b4d3206e981a6e5218890dee23e41ca9b04bab4ee8dbc45969dd1415236_0",
+            "is_ignored": false,
+            "lines": "    c.execute(\"UPDATE users SET password = '{}' WHERE username = '{}'\".format(password, username))",
+            "message": "SQL Injection is a critical vulnerability that can lead to data or system compromise. By\ndynamically generating SQL query strings, user input may be able to influence the logic of\nthe SQL statement. This could lead to an adversary accessing information they should\nnot have access to, or in some circumstances, being able to execute OS functionality or code.\n\nReplace all dynamically generated SQL queries with parameterized queries. In situations where\ndynamic queries must be created, never use direct user input, but instead use a map or\ndictionary of valid values and resolve them using a user supplied key.\n\nFor example, some database drivers do not allow parameterized queries for `>` or `<` comparison\noperators. In these cases, do not use a user supplied `>` or `<` value, but rather have the\nuser\nsupply a `gt` or `lt` value. The alphabetical values are then used to look up the `>` and `<`\nvalues to be used in the construction of the dynamic query. The same goes for other queries\nwhere\ncolumn or table names are required but cannot be parameterized.\n\nExample using `PreparedStatement` queries:\n```\nimport sqlite3\n\n# Create a new database (in memory)\ncon = sqlite3.connect(\":memory:\")\n# Get a cursor from the connection\ncur = con.cursor()\n# Create a tuple of the value to be used in the parameterized query\nparams = ('user-input',)\n# execute the statement, passing in the params for the value\ncur.execute(\"select name from sqlite_master where name = ?\", params)\n# work with the result\nresult = cur.fetchall()\n```\n\nFor more information on SQL Injection see OWASP:\nhttps://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-89",
+                "owasp": ["A1:2017-Injection", "A03:2021-Injection"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Improper neutralization of special elements used in an SQL Command ('SQL Injection')"
+            },
+            "metavars": {
+                "$1": {
+                    "abstract_content": "UPDATE",
+                    "end": {
+                        "col": 7,
+                        "line": 1,
+                        "offset": 6
+                    },
+                    "start": {
+                        "col": 1,
+                        "line": 1,
+                        "offset": 0
+                    }
+                },
+                "$DB": {
+                    "abstract_content": "c",
+                    "end": {
+                        "col": 6,
+                        "line": 53,
+                        "offset": 1208
+                    },
+                    "propagated_value": {
+                        "svalue_abstract_content": "conn.cursor()",
+                        "svalue_end": {
+                            "col": 22,
+                            "line": 51,
+                            "offset": 1201
+                        },
+                        "svalue_start": {
+                            "col": 9,
+                            "line": 51,
+                            "offset": 1188
+                        }
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 53,
+                        "offset": 1207
+                    }
+                },
+                "$QUERY": {
+                    "abstract_content": "UPDATE users SET password = '{}' WHERE username = '{}'",
+                    "end": {
+                        "col": 70,
+                        "line": 53,
+                        "offset": 1272
+                    },
+                    "start": {
+                        "col": 16,
+                        "line": 53,
+                        "offset": 1218
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "bad/libuser.py",
+        "start": {
+            "col": 5,
+            "line": 53,
+            "offset": 1207
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.flask.python_flask_rule-app-debug",
+        "end": {
+            "col": 87,
+            "line": 29,
+            "offset": 720
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "31b89bd4c552bab67c3e2277c7053cc4ee5ff947285183182a8e70abf82fd809b486a54ef1048014cc9ec02563951776cabe618cba5aae5fde8d43ec2462612b_0",
+            "is_ignored": false,
+            "lines": "app.run(debug=True, host='127.0.1.1', ssl_context=('/tmp/acme.cert', '/tmp/acme.key'))",
+            "message": "The Flask application is running with `debug=True` configured. By enabling this option, certain\nexceptions or errors could cause sensitive information to be leaked in HTTP responses.\n\nAdditionally, it is not recommended to run a Flask application using `Flask.run(...)` in\nproduction. Instead, a WSGI server such as\n[gunicorn](https://flask.palletsprojects.com/en/2.3.x/deploying/gunicorn/)\nor [waitress](https://flask.palletsprojects.com/en/2.3.x/deploying/waitress/) be used instead.\n\nFor more information on deployment options for Flask applications see:\n- https://flask.palletsprojects.com/en/2.3.x/deploying/\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-489",
+                "owasp": ["A6:2017-Security Misconfiguration", "A05:2021-Security Misconfiguration"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Active debug code"
+            },
+            "metavars": {
+                "$APP": {
+                    "abstract_content": "app",
+                    "end": {
+                        "col": 4,
+                        "line": 29,
+                        "offset": 637
+                    },
+                    "propagated_value": {
+                        "svalue_abstract_content": "Flask('vulpy')",
+                        "svalue_end": {
+                            "col": 21,
+                            "line": 12,
+                            "offset": 233
+                        },
+                        "svalue_start": {
+                            "col": 7,
+                            "line": 12,
+                            "offset": 219
+                        }
+                    },
+                    "start": {
+                        "col": 1,
+                        "line": 29,
+                        "offset": 634
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "bad/vulpy-ssl.py",
+        "start": {
+            "col": 1,
+            "line": 29,
+            "offset": 634
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.flask.python_flask_rule-app-debug",
+        "end": {
+            "col": 72,
+            "line": 55,
+            "offset": 1341
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "75924af0991d5ec66a8ee6dc0747d0d2a7b30515d2d91de69c903855fc149983152ae88ba2d18259a766cffe8586d09da7845db8049d448975011a438f022b3c_0",
+            "is_ignored": false,
+            "lines": "app.run(debug=True, host='127.0.1.1', port=5000, extra_files='csp.txt')",
+            "message": "The Flask application is running with `debug=True` configured. By enabling this option, certain\nexceptions or errors could cause sensitive information to be leaked in HTTP responses.\n\nAdditionally, it is not recommended to run a Flask application using `Flask.run(...)` in\nproduction. Instead, a WSGI server such as\n[gunicorn](https://flask.palletsprojects.com/en/2.3.x/deploying/gunicorn/)\nor [waitress](https://flask.palletsprojects.com/en/2.3.x/deploying/waitress/) be used instead.\n\nFor more information on deployment options for Flask applications see:\n- https://flask.palletsprojects.com/en/2.3.x/deploying/\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-489",
+                "owasp": ["A6:2017-Security Misconfiguration", "A05:2021-Security Misconfiguration"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Active debug code"
+            },
+            "metavars": {
+                "$APP": {
+                    "abstract_content": "app",
+                    "end": {
+                        "col": 4,
+                        "line": 55,
+                        "offset": 1273
+                    },
+                    "propagated_value": {
+                        "svalue_abstract_content": "Flask('vulpy')",
+                        "svalue_end": {
+                            "col": 21,
+                            "line": 15,
+                            "offset": 314
+                        },
+                        "svalue_start": {
+                            "col": 7,
+                            "line": 15,
+                            "offset": 300
+                        }
+                    },
+                    "start": {
+                        "col": 1,
+                        "line": 55,
+                        "offset": 1270
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "bad/vulpy.py",
+        "start": {
+            "col": 1,
+            "line": 55,
+            "offset": 1270
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.tmpdir.python_tmpdir_rule-hardcodedtmp",
+        "end": {
+            "col": 43,
+            "line": 3,
+            "offset": 53
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "3a3f619995989ba42d467c51dd0f9336856761195e98f2aa3c226b6448cf07df533293c219d76de79e9ff173a678a36062e164404c440a8bf83a4f7ed99b9a27_0",
+            "is_ignored": false,
+            "lines": "with open('/tmp/darkweb2017-top10000.txt') as f:",
+            "message": "The application was found creating files in shared system temporary directories\n(`/tmp` or `/var/tmp`) without using the `tempfile.TemporaryFile` function. Depending\non how the application uses this temporary file, an attacker may be able to create\nsymlinks that point to other files prior to the application creating or writing\nto the target file, leading to unintended files being created or overwritten.\n\nExample using `tempfile.TemporaryFile` to write a file:\n```\nimport tempfile\n\n# Open a new temporary file using a context manager\nwith tempfile.TemporaryFile() as fp:\n    # Write some data to the temporary file\n    fp.write(b'Some data')\n    # Seek back to beginning of file\n    fp.seek(0)\n    # Read it\n    data = fp.read()\n# File is automatically closed/removed once we exit the with context\n```\n\nFor more information on alternative tempfile functions see:\n- https://docs.python.org/3/library/tempfile.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-377",
+                "owasp": ["A5:2017-Broken Access Control", "A01:2021-Broken Access Control"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Insecure temporary file"
+            },
+            "metavars": {
+                "$CALL": {
+                    "abstract_content": "open",
+                    "end": {
+                        "col": 10,
+                        "line": 3,
+                        "offset": 20
+                    },
+                    "start": {
+                        "col": 6,
+                        "line": 3,
+                        "offset": 16
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "good/cutpasswd.py",
+        "start": {
+            "col": 6,
+            "line": 3,
+            "offset": 16
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.requests.python_requests_rule-request-without-timeout",
+        "end": {
+            "col": 87,
+            "line": 22,
+            "offset": 352
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "4d3c1d12342eea289a4408fdf1d022b4c94e695620bd74539a75b20e3943196c1c0a93ecb38fa596e708341cca56c850526728d9d1b85b7ed9f70b06e143b41c_0",
+            "is_ignored": false,
+            "lines": "    response = requests.post(URL, data = {'username': username, 'password': password})",
+            "message": "The application was found using the `requests` module without configuring a timeout value for\nconnections. This could lead to uncontrolled resource consumption where the application could\nrun out of\nsocket descriptors, effectively causing a Denial of Service (DoS).\n\nTo remediate this issue, pass in a `timeout=` argument to each `requests` call.\n\nExample using a timeout for an HTTP GET request:\n```\n# Issue a GET request to https://example.com with a timeout of 10 seconds\nresponse = requests.get('https://example.com', timeout=10)\n# Work with the response object\n# ...\n```\n\nFor more information on using the requests module see:\n- https://requests.readthedocs.io/en/latest/api/\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-400",
+                "owasp": ["A6:2017-Security Misconfiguration", "A05:2021-Security Misconfiguration"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Uncontrolled resource consumption"
+            },
+            "metavars": {
+                "$1": {
+                    "abstract_content": "post",
+                    "end": {
+                        "col": 5,
+                        "line": 1,
+                        "offset": 4
+                    },
+                    "start": {
+                        "col": 1,
+                        "line": 1,
+                        "offset": 0
+                    }
+                },
+                "$METHOD": {
+                    "abstract_content": "post",
+                    "end": {
+                        "col": 29,
+                        "line": 22,
+                        "offset": 294
+                    },
+                    "start": {
+                        "col": 25,
+                        "line": 22,
+                        "offset": 290
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "good/httpbrute.py",
+        "start": {
+            "col": 16,
+            "line": 22,
+            "offset": 281
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.sql.python_sql_rule-hardcoded-sql-expression",
+        "end": {
+            "col": 171,
+            "line": 61,
+            "offset": 1523
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "a38a62c23b73b157603aad7c92854e5e0cbc6c01d9b4c3c49902b5783a18fd168c73b6a4c23e69019f295ddae17c98e74c374f40792b14c64f187eae6b223f2e_0",
+            "is_ignored": false,
+            "lines": "    c.execute(\"INSERT INTO users (username, password, salt, failures, mfa_enabled, mfa_secret) VALUES ('%s', '%s', '%s', '%d', '%d', '%s')\" %(username, '', '', 0, 0, ''))",
+            "message": "SQL Injection is a critical vulnerability that can lead to data or system compromise. By\ndynamically generating SQL query strings, user input may be able to influence the logic of\nthe SQL statement. This could lead to an adversary accessing information they should\nnot have access to, or in some circumstances, being able to execute OS functionality or code.\n\nReplace all dynamically generated SQL queries with parameterized queries. In situations where\ndynamic queries must be created, never use direct user input, but instead use a map or\ndictionary of valid values and resolve them using a user supplied key.\n\nFor example, some database drivers do not allow parameterized queries for `>` or `<` comparison\noperators. In these cases, do not use a user supplied `>` or `<` value, but rather have the\nuser\nsupply a `gt` or `lt` value. The alphabetical values are then used to look up the `>` and `<`\nvalues to be used in the construction of the dynamic query. The same goes for other queries\nwhere\ncolumn or table names are required but cannot be parameterized.\n\nExample using `PreparedStatement` queries:\n```\nimport sqlite3\n\n# Create a new database (in memory)\ncon = sqlite3.connect(\":memory:\")\n# Get a cursor from the connection\ncur = con.cursor()\n# Create a tuple of the value to be used in the parameterized query\nparams = ('user-input',)\n# execute the statement, passing in the params for the value\ncur.execute(\"select name from sqlite_master where name = ?\", params)\n# work with the result\nresult = cur.fetchall()\n```\n\nFor more information on SQL Injection see OWASP:\nhttps://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-89",
+                "owasp": ["A1:2017-Injection", "A03:2021-Injection"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Improper neutralization of special elements used in an SQL Command ('SQL Injection')"
+            },
+            "metavars": {
+                "$1": {
+                    "abstract_content": "INSERT",
+                    "end": {
+                        "col": 7,
+                        "line": 1,
+                        "offset": 6
+                    },
+                    "start": {
+                        "col": 1,
+                        "line": 1,
+                        "offset": 0
+                    }
+                },
+                "$DB": {
+                    "abstract_content": "c",
+                    "end": {
+                        "col": 6,
+                        "line": 61,
+                        "offset": 1358
+                    },
+                    "propagated_value": {
+                        "svalue_abstract_content": "conn.cursor()",
+                        "svalue_end": {
+                            "col": 22,
+                            "line": 60,
+                            "offset": 1352
+                        },
+                        "svalue_start": {
+                            "col": 9,
+                            "line": 60,
+                            "offset": 1339
+                        }
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 61,
+                        "offset": 1357
+                    }
+                },
+                "$QUERY": {
+                    "abstract_content": "INSERT INTO users (username, password, salt, failures, mfa_enabled, mfa_secret) VALUES ('%s', '%s', '%s', '%d', '%d', '%s')",
+                    "end": {
+                        "col": 139,
+                        "line": 61,
+                        "offset": 1491
+                    },
+                    "start": {
+                        "col": 16,
+                        "line": 61,
+                        "offset": 1368
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "good/libuser.py",
+        "start": {
+            "col": 5,
+            "line": 61,
+            "offset": 1357
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.flask.python_flask_rule-app-debug",
+        "end": {
+            "col": 87,
+            "line": 29,
+            "offset": 720
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "a3d37f05510de2f7c5a1b199a9d753809f29715c8185832d21d237b17d33e8773a1449a1410fb36297119d3e2d2b502cf8947d053fd598566587e5cbcced8c4c_0",
+            "is_ignored": false,
+            "lines": "app.run(debug=True, host='127.0.1.1', ssl_context=('/tmp/acme.cert', '/tmp/acme.key'))",
+            "message": "The Flask application is running with `debug=True` configured. By enabling this option, certain\nexceptions or errors could cause sensitive information to be leaked in HTTP responses.\n\nAdditionally, it is not recommended to run a Flask application using `Flask.run(...)` in\nproduction. Instead, a WSGI server such as\n[gunicorn](https://flask.palletsprojects.com/en/2.3.x/deploying/gunicorn/)\nor [waitress](https://flask.palletsprojects.com/en/2.3.x/deploying/waitress/) be used instead.\n\nFor more information on deployment options for Flask applications see:\n- https://flask.palletsprojects.com/en/2.3.x/deploying/\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-489",
+                "owasp": ["A6:2017-Security Misconfiguration", "A05:2021-Security Misconfiguration"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Active debug code"
+            },
+            "metavars": {
+                "$APP": {
+                    "abstract_content": "app",
+                    "end": {
+                        "col": 4,
+                        "line": 29,
+                        "offset": 637
+                    },
+                    "propagated_value": {
+                        "svalue_abstract_content": "Flask('vulpy')",
+                        "svalue_end": {
+                            "col": 21,
+                            "line": 12,
+                            "offset": 233
+                        },
+                        "svalue_start": {
+                            "col": 7,
+                            "line": 12,
+                            "offset": 219
+                        }
+                    },
+                    "start": {
+                        "col": 1,
+                        "line": 29,
+                        "offset": 634
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "good/vulpy-ssl.py",
+        "start": {
+            "col": 1,
+            "line": 29,
+            "offset": 634
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.flask.python_flask_rule-app-debug",
+        "end": {
+            "col": 72,
+            "line": 53,
+            "offset": 1393
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "97331cc1621e298d3c651e804b5861722f2f7c30fb1020113cfdbf064ea559e5cb825a901b4e4df0a09f379a1c5260b3c31cab1e3e3c5ea2b07fa60ec9e995db_0",
+            "is_ignored": false,
+            "lines": "app.run(debug=True, host='127.0.1.1', port=5001, extra_files='csp.txt')",
+            "message": "The Flask application is running with `debug=True` configured. By enabling this option, certain\nexceptions or errors could cause sensitive information to be leaked in HTTP responses.\n\nAdditionally, it is not recommended to run a Flask application using `Flask.run(...)` in\nproduction. Instead, a WSGI server such as\n[gunicorn](https://flask.palletsprojects.com/en/2.3.x/deploying/gunicorn/)\nor [waitress](https://flask.palletsprojects.com/en/2.3.x/deploying/waitress/) be used instead.\n\nFor more information on deployment options for Flask applications see:\n- https://flask.palletsprojects.com/en/2.3.x/deploying/\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-489",
+                "owasp": ["A6:2017-Security Misconfiguration", "A05:2021-Security Misconfiguration"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Active debug code"
+            },
+            "metavars": {
+                "$APP": {
+                    "abstract_content": "app",
+                    "end": {
+                        "col": 4,
+                        "line": 53,
+                        "offset": 1325
+                    },
+                    "propagated_value": {
+                        "svalue_abstract_content": "Flask('vulpy')",
+                        "svalue_end": {
+                            "col": 21,
+                            "line": 16,
+                            "offset": 315
+                        },
+                        "svalue_start": {
+                            "col": 7,
+                            "line": 16,
+                            "offset": 301
+                        }
+                    },
+                    "start": {
+                        "col": 1,
+                        "line": 53,
+                        "offset": 1322
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "good/vulpy.py",
+        "start": {
+            "col": 1,
+            "line": 53,
+            "offset": 1322
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.tmpdir.python_tmpdir_rule-hardcodedtmp",
+        "end": {
+            "col": 31,
+            "line": 31,
+            "offset": 863
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "f13a04c9b23debc25a7724667b70e5d8ea567e6c48b7e445374efe879d43eb576dcfad76a5043fd84f7eb96b333578636ae88bdcd2ab54b28cb9528b894e4316_0",
+            "is_ignored": false,
+            "lines": "with open('/tmp/ca.key', 'wb') as out:",
+            "message": "The application was found creating files in shared system temporary directories\n(`/tmp` or `/var/tmp`) without using the `tempfile.TemporaryFile` function. Depending\non how the application uses this temporary file, an attacker may be able to create\nsymlinks that point to other files prior to the application creating or writing\nto the target file, leading to unintended files being created or overwritten.\n\nExample using `tempfile.TemporaryFile` to write a file:\n```\nimport tempfile\n\n# Open a new temporary file using a context manager\nwith tempfile.TemporaryFile() as fp:\n    # Write some data to the temporary file\n    fp.write(b'Some data')\n    # Seek back to beginning of file\n    fp.seek(0)\n    # Read it\n    data = fp.read()\n# File is automatically closed/removed once we exit the with context\n```\n\nFor more information on alternative tempfile functions see:\n- https://docs.python.org/3/library/tempfile.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-377",
+                "owasp": ["A5:2017-Broken Access Control", "A01:2021-Broken Access Control"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Insecure temporary file"
+            },
+            "metavars": {
+                "$CALL": {
+                    "abstract_content": "open",
+                    "end": {
+                        "col": 10,
+                        "line": 31,
+                        "offset": 842
+                    },
+                    "start": {
+                        "col": 6,
+                        "line": 31,
+                        "offset": 838
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "utils/ca-create.py",
+        "start": {
+            "col": 6,
+            "line": 31,
+            "offset": 838
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.tmpdir.python_tmpdir_rule-hardcodedtmp",
+        "end": {
+            "col": 31,
+            "line": 34,
+            "offset": 930
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "f13a04c9b23debc25a7724667b70e5d8ea567e6c48b7e445374efe879d43eb576dcfad76a5043fd84f7eb96b333578636ae88bdcd2ab54b28cb9528b894e4316_1",
+            "is_ignored": false,
+            "lines": "with open('/tmp/ca.pub', 'wb') as out:",
+            "message": "The application was found creating files in shared system temporary directories\n(`/tmp` or `/var/tmp`) without using the `tempfile.TemporaryFile` function. Depending\non how the application uses this temporary file, an attacker may be able to create\nsymlinks that point to other files prior to the application creating or writing\nto the target file, leading to unintended files being created or overwritten.\n\nExample using `tempfile.TemporaryFile` to write a file:\n```\nimport tempfile\n\n# Open a new temporary file using a context manager\nwith tempfile.TemporaryFile() as fp:\n    # Write some data to the temporary file\n    fp.write(b'Some data')\n    # Seek back to beginning of file\n    fp.seek(0)\n    # Read it\n    data = fp.read()\n# File is automatically closed/removed once we exit the with context\n```\n\nFor more information on alternative tempfile functions see:\n- https://docs.python.org/3/library/tempfile.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-377",
+                "owasp": ["A5:2017-Broken Access Control", "A01:2021-Broken Access Control"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Insecure temporary file"
+            },
+            "metavars": {
+                "$CALL": {
+                    "abstract_content": "open",
+                    "end": {
+                        "col": 10,
+                        "line": 34,
+                        "offset": 909
+                    },
+                    "start": {
+                        "col": 6,
+                        "line": 34,
+                        "offset": 905
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "utils/ca-create.py",
+        "start": {
+            "col": 6,
+            "line": 34,
+            "offset": 905
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.tmpdir.python_tmpdir_rule-hardcodedtmp",
+        "end": {
+            "col": 32,
+            "line": 58,
+            "offset": 1948
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "f13a04c9b23debc25a7724667b70e5d8ea567e6c48b7e445374efe879d43eb576dcfad76a5043fd84f7eb96b333578636ae88bdcd2ab54b28cb9528b894e4316_2",
+            "is_ignored": false,
+            "lines": "with open('/tmp/ca.cert', 'wb') as out:",
+            "message": "The application was found creating files in shared system temporary directories\n(`/tmp` or `/var/tmp`) without using the `tempfile.TemporaryFile` function. Depending\non how the application uses this temporary file, an attacker may be able to create\nsymlinks that point to other files prior to the application creating or writing\nto the target file, leading to unintended files being created or overwritten.\n\nExample using `tempfile.TemporaryFile` to write a file:\n```\nimport tempfile\n\n# Open a new temporary file using a context manager\nwith tempfile.TemporaryFile() as fp:\n    # Write some data to the temporary file\n    fp.write(b'Some data')\n    # Seek back to beginning of file\n    fp.seek(0)\n    # Read it\n    data = fp.read()\n# File is automatically closed/removed once we exit the with context\n```\n\nFor more information on alternative tempfile functions see:\n- https://docs.python.org/3/library/tempfile.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-377",
+                "owasp": ["A5:2017-Broken Access Control", "A01:2021-Broken Access Control"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Insecure temporary file"
+            },
+            "metavars": {
+                "$CALL": {
+                    "abstract_content": "open",
+                    "end": {
+                        "col": 10,
+                        "line": 58,
+                        "offset": 1926
+                    },
+                    "start": {
+                        "col": 6,
+                        "line": 58,
+                        "offset": 1922
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "utils/ca-create.py",
+        "start": {
+            "col": 6,
+            "line": 58,
+            "offset": 1922
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.tmpdir.python_tmpdir_rule-hardcodedtmp",
+        "end": {
+            "col": 33,
+            "line": 12,
+            "offset": 368
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "460da92713cca69823b431906b21c87443cc18b4842dc1c6594f44edfa3811ea3bccf1d680c945a9f48385d40e64da04748355ca727d67e6b0491a9471e2aafd_0",
+            "is_ignored": false,
+            "lines": "with open(\"/tmp/acme.key\", \"rb\") as key_file:",
+            "message": "The application was found creating files in shared system temporary directories\n(`/tmp` or `/var/tmp`) without using the `tempfile.TemporaryFile` function. Depending\non how the application uses this temporary file, an attacker may be able to create\nsymlinks that point to other files prior to the application creating or writing\nto the target file, leading to unintended files being created or overwritten.\n\nExample using `tempfile.TemporaryFile` to write a file:\n```\nimport tempfile\n\n# Open a new temporary file using a context manager\nwith tempfile.TemporaryFile() as fp:\n    # Write some data to the temporary file\n    fp.write(b'Some data')\n    # Seek back to beginning of file\n    fp.seek(0)\n    # Read it\n    data = fp.read()\n# File is automatically closed/removed once we exit the with context\n```\n\nFor more information on alternative tempfile functions see:\n- https://docs.python.org/3/library/tempfile.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-377",
+                "owasp": ["A5:2017-Broken Access Control", "A01:2021-Broken Access Control"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Insecure temporary file"
+            },
+            "metavars": {
+                "$CALL": {
+                    "abstract_content": "open",
+                    "end": {
+                        "col": 10,
+                        "line": 12,
+                        "offset": 345
+                    },
+                    "start": {
+                        "col": 6,
+                        "line": 12,
+                        "offset": 341
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "utils/ca-csr-create.py",
+        "start": {
+            "col": 6,
+            "line": 12,
+            "offset": 341
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.tmpdir.python_tmpdir_rule-hardcodedtmp",
+        "end": {
+            "col": 33,
+            "line": 35,
+            "offset": 1142
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "460da92713cca69823b431906b21c87443cc18b4842dc1c6594f44edfa3811ea3bccf1d680c945a9f48385d40e64da04748355ca727d67e6b0491a9471e2aafd_1",
+            "is_ignored": false,
+            "lines": "with open(\"/tmp/acme.csr\", \"wb\") as out:",
+            "message": "The application was found creating files in shared system temporary directories\n(`/tmp` or `/var/tmp`) without using the `tempfile.TemporaryFile` function. Depending\non how the application uses this temporary file, an attacker may be able to create\nsymlinks that point to other files prior to the application creating or writing\nto the target file, leading to unintended files being created or overwritten.\n\nExample using `tempfile.TemporaryFile` to write a file:\n```\nimport tempfile\n\n# Open a new temporary file using a context manager\nwith tempfile.TemporaryFile() as fp:\n    # Write some data to the temporary file\n    fp.write(b'Some data')\n    # Seek back to beginning of file\n    fp.seek(0)\n    # Read it\n    data = fp.read()\n# File is automatically closed/removed once we exit the with context\n```\n\nFor more information on alternative tempfile functions see:\n- https://docs.python.org/3/library/tempfile.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-377",
+                "owasp": ["A5:2017-Broken Access Control", "A01:2021-Broken Access Control"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Insecure temporary file"
+            },
+            "metavars": {
+                "$CALL": {
+                    "abstract_content": "open",
+                    "end": {
+                        "col": 10,
+                        "line": 35,
+                        "offset": 1119
+                    },
+                    "start": {
+                        "col": 6,
+                        "line": 35,
+                        "offset": 1115
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "utils/ca-csr-create.py",
+        "start": {
+            "col": 6,
+            "line": 35,
+            "offset": 1115
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.tmpdir.python_tmpdir_rule-hardcodedtmp",
+        "end": {
+            "col": 32,
+            "line": 13,
+            "offset": 368
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "7e4f3475f3507adf9af1f97d063eb75b41477a663e9e573388e80d7127bafdae314c7d3dd030bfb2f6ffb26f5cd886f434c8288321941095579c859b1ba7114f_0",
+            "is_ignored": false,
+            "lines": "with open(\"/tmp/ca.cert\", \"rb\") as ca_cert_file:",
+            "message": "The application was found creating files in shared system temporary directories\n(`/tmp` or `/var/tmp`) without using the `tempfile.TemporaryFile` function. Depending\non how the application uses this temporary file, an attacker may be able to create\nsymlinks that point to other files prior to the application creating or writing\nto the target file, leading to unintended files being created or overwritten.\n\nExample using `tempfile.TemporaryFile` to write a file:\n```\nimport tempfile\n\n# Open a new temporary file using a context manager\nwith tempfile.TemporaryFile() as fp:\n    # Write some data to the temporary file\n    fp.write(b'Some data')\n    # Seek back to beginning of file\n    fp.seek(0)\n    # Read it\n    data = fp.read()\n# File is automatically closed/removed once we exit the with context\n```\n\nFor more information on alternative tempfile functions see:\n- https://docs.python.org/3/library/tempfile.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-377",
+                "owasp": ["A5:2017-Broken Access Control", "A01:2021-Broken Access Control"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Insecure temporary file"
+            },
+            "metavars": {
+                "$CALL": {
+                    "abstract_content": "open",
+                    "end": {
+                        "col": 10,
+                        "line": 13,
+                        "offset": 346
+                    },
+                    "start": {
+                        "col": 6,
+                        "line": 13,
+                        "offset": 342
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "utils/ca-csr-load.py",
+        "start": {
+            "col": 6,
+            "line": 13,
+            "offset": 342
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.tmpdir.python_tmpdir_rule-hardcodedtmp",
+        "end": {
+            "col": 33,
+            "line": 16,
+            "offset": 504
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "7e4f3475f3507adf9af1f97d063eb75b41477a663e9e573388e80d7127bafdae314c7d3dd030bfb2f6ffb26f5cd886f434c8288321941095579c859b1ba7114f_1",
+            "is_ignored": false,
+            "lines": "with open(\"/tmp/acme.csr\", \"rb\") as csr_file:",
+            "message": "The application was found creating files in shared system temporary directories\n(`/tmp` or `/var/tmp`) without using the `tempfile.TemporaryFile` function. Depending\non how the application uses this temporary file, an attacker may be able to create\nsymlinks that point to other files prior to the application creating or writing\nto the target file, leading to unintended files being created or overwritten.\n\nExample using `tempfile.TemporaryFile` to write a file:\n```\nimport tempfile\n\n# Open a new temporary file using a context manager\nwith tempfile.TemporaryFile() as fp:\n    # Write some data to the temporary file\n    fp.write(b'Some data')\n    # Seek back to beginning of file\n    fp.seek(0)\n    # Read it\n    data = fp.read()\n# File is automatically closed/removed once we exit the with context\n```\n\nFor more information on alternative tempfile functions see:\n- https://docs.python.org/3/library/tempfile.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-377",
+                "owasp": ["A5:2017-Broken Access Control", "A01:2021-Broken Access Control"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Insecure temporary file"
+            },
+            "metavars": {
+                "$CALL": {
+                    "abstract_content": "open",
+                    "end": {
+                        "col": 10,
+                        "line": 16,
+                        "offset": 481
+                    },
+                    "start": {
+                        "col": 6,
+                        "line": 16,
+                        "offset": 477
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "utils/ca-csr-load.py",
+        "start": {
+            "col": 6,
+            "line": 16,
+            "offset": 477
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.tmpdir.python_tmpdir_rule-hardcodedtmp",
+        "end": {
+            "col": 31,
+            "line": 19,
+            "offset": 618
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "7e4f3475f3507adf9af1f97d063eb75b41477a663e9e573388e80d7127bafdae314c7d3dd030bfb2f6ffb26f5cd886f434c8288321941095579c859b1ba7114f_2",
+            "is_ignored": false,
+            "lines": "with open(\"/tmp/ca.key\", \"rb\") as key_file:",
+            "message": "The application was found creating files in shared system temporary directories\n(`/tmp` or `/var/tmp`) without using the `tempfile.TemporaryFile` function. Depending\non how the application uses this temporary file, an attacker may be able to create\nsymlinks that point to other files prior to the application creating or writing\nto the target file, leading to unintended files being created or overwritten.\n\nExample using `tempfile.TemporaryFile` to write a file:\n```\nimport tempfile\n\n# Open a new temporary file using a context manager\nwith tempfile.TemporaryFile() as fp:\n    # Write some data to the temporary file\n    fp.write(b'Some data')\n    # Seek back to beginning of file\n    fp.seek(0)\n    # Read it\n    data = fp.read()\n# File is automatically closed/removed once we exit the with context\n```\n\nFor more information on alternative tempfile functions see:\n- https://docs.python.org/3/library/tempfile.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-377",
+                "owasp": ["A5:2017-Broken Access Control", "A01:2021-Broken Access Control"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Insecure temporary file"
+            },
+            "metavars": {
+                "$CALL": {
+                    "abstract_content": "open",
+                    "end": {
+                        "col": 10,
+                        "line": 19,
+                        "offset": 597
+                    },
+                    "start": {
+                        "col": 6,
+                        "line": 19,
+                        "offset": 593
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "utils/ca-csr-load.py",
+        "start": {
+            "col": 6,
+            "line": 19,
+            "offset": 593
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.tmpdir.python_tmpdir_rule-hardcodedtmp",
+        "end": {
+            "col": 34,
+            "line": 35,
+            "offset": 1251
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "7e4f3475f3507adf9af1f97d063eb75b41477a663e9e573388e80d7127bafdae314c7d3dd030bfb2f6ffb26f5cd886f434c8288321941095579c859b1ba7114f_3",
+            "is_ignored": false,
+            "lines": "with open('/tmp/acme.cert', 'wb') as out:",
+            "message": "The application was found creating files in shared system temporary directories\n(`/tmp` or `/var/tmp`) without using the `tempfile.TemporaryFile` function. Depending\non how the application uses this temporary file, an attacker may be able to create\nsymlinks that point to other files prior to the application creating or writing\nto the target file, leading to unintended files being created or overwritten.\n\nExample using `tempfile.TemporaryFile` to write a file:\n```\nimport tempfile\n\n# Open a new temporary file using a context manager\nwith tempfile.TemporaryFile() as fp:\n    # Write some data to the temporary file\n    fp.write(b'Some data')\n    # Seek back to beginning of file\n    fp.seek(0)\n    # Read it\n    data = fp.read()\n# File is automatically closed/removed once we exit the with context\n```\n\nFor more information on alternative tempfile functions see:\n- https://docs.python.org/3/library/tempfile.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-377",
+                "owasp": ["A5:2017-Broken Access Control", "A01:2021-Broken Access Control"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Insecure temporary file"
+            },
+            "metavars": {
+                "$CALL": {
+                    "abstract_content": "open",
+                    "end": {
+                        "col": 10,
+                        "line": 35,
+                        "offset": 1227
+                    },
+                    "start": {
+                        "col": 6,
+                        "line": 35,
+                        "offset": 1223
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "utils/ca-csr-load.py",
+        "start": {
+            "col": 6,
+            "line": 35,
+            "offset": 1223
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.tmpdir.python_tmpdir_rule-hardcodedtmp",
+        "end": {
+            "col": 33,
+            "line": 14,
+            "offset": 373
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "e5136fd6f0a6a88babfba98f48fd7bb1eca6c0b6fc6d6e1fe362d45f3c8ffac33e8e77157473111ef1c3f807131d38600016674d7dfbc29a1391fb9e061ecbc0_0",
+            "is_ignored": false,
+            "lines": "with open(\"/tmp/acme.key\", \"rb\") as key_file:",
+            "message": "The application was found creating files in shared system temporary directories\n(`/tmp` or `/var/tmp`) without using the `tempfile.TemporaryFile` function. Depending\non how the application uses this temporary file, an attacker may be able to create\nsymlinks that point to other files prior to the application creating or writing\nto the target file, leading to unintended files being created or overwritten.\n\nExample using `tempfile.TemporaryFile` to write a file:\n```\nimport tempfile\n\n# Open a new temporary file using a context manager\nwith tempfile.TemporaryFile() as fp:\n    # Write some data to the temporary file\n    fp.write(b'Some data')\n    # Seek back to beginning of file\n    fp.seek(0)\n    # Read it\n    data = fp.read()\n# File is automatically closed/removed once we exit the with context\n```\n\nFor more information on alternative tempfile functions see:\n- https://docs.python.org/3/library/tempfile.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-377",
+                "owasp": ["A5:2017-Broken Access Control", "A01:2021-Broken Access Control"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Insecure temporary file"
+            },
+            "metavars": {
+                "$CALL": {
+                    "abstract_content": "open",
+                    "end": {
+                        "col": 10,
+                        "line": 14,
+                        "offset": 350
+                    },
+                    "start": {
+                        "col": 6,
+                        "line": 14,
+                        "offset": 346
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "utils/rsa-decrypt.py",
+        "start": {
+            "col": 6,
+            "line": 14,
+            "offset": 346
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.tmpdir.python_tmpdir_rule-hardcodedtmp",
+        "end": {
+            "col": 33,
+            "line": 14,
+            "offset": 353
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "ec4fc9fc39a4d13745bc60017f0c03891f4835fca501b77be3b3970516f546cddc9a0cd4c31978cd37234259cc4e8fccfc89a056d218c85d82af2993ff6a3696_0",
+            "is_ignored": false,
+            "lines": "with open(\"/tmp/acme.pub\", \"rb\") as key_file:",
+            "message": "The application was found creating files in shared system temporary directories\n(`/tmp` or `/var/tmp`) without using the `tempfile.TemporaryFile` function. Depending\non how the application uses this temporary file, an attacker may be able to create\nsymlinks that point to other files prior to the application creating or writing\nto the target file, leading to unintended files being created or overwritten.\n\nExample using `tempfile.TemporaryFile` to write a file:\n```\nimport tempfile\n\n# Open a new temporary file using a context manager\nwith tempfile.TemporaryFile() as fp:\n    # Write some data to the temporary file\n    fp.write(b'Some data')\n    # Seek back to beginning of file\n    fp.seek(0)\n    # Read it\n    data = fp.read()\n# File is automatically closed/removed once we exit the with context\n```\n\nFor more information on alternative tempfile functions see:\n- https://docs.python.org/3/library/tempfile.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-377",
+                "owasp": ["A5:2017-Broken Access Control", "A01:2021-Broken Access Control"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Insecure temporary file"
+            },
+            "metavars": {
+                "$CALL": {
+                    "abstract_content": "open",
+                    "end": {
+                        "col": 10,
+                        "line": 14,
+                        "offset": 330
+                    },
+                    "start": {
+                        "col": 6,
+                        "line": 14,
+                        "offset": 326
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "utils/rsa-encrypt.py",
+        "start": {
+            "col": 6,
+            "line": 14,
+            "offset": 326
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.tmpdir.python_tmpdir_rule-hardcodedtmp",
+        "end": {
+            "col": 33,
+            "line": 26,
+            "offset": 726
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "fa4996b5fc8179a5c9884d56edac9374015519c48bef7df73f10dc0044ec0d0e416e876ae99692b397c90ee2a3dab154247aa886688009e6ca362dd3f086a304_0",
+            "is_ignored": false,
+            "lines": "with open('/tmp/acme.key', 'wb') as out:",
+            "message": "The application was found creating files in shared system temporary directories\n(`/tmp` or `/var/tmp`) without using the `tempfile.TemporaryFile` function. Depending\non how the application uses this temporary file, an attacker may be able to create\nsymlinks that point to other files prior to the application creating or writing\nto the target file, leading to unintended files being created or overwritten.\n\nExample using `tempfile.TemporaryFile` to write a file:\n```\nimport tempfile\n\n# Open a new temporary file using a context manager\nwith tempfile.TemporaryFile() as fp:\n    # Write some data to the temporary file\n    fp.write(b'Some data')\n    # Seek back to beginning of file\n    fp.seek(0)\n    # Read it\n    data = fp.read()\n# File is automatically closed/removed once we exit the with context\n```\n\nFor more information on alternative tempfile functions see:\n- https://docs.python.org/3/library/tempfile.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-377",
+                "owasp": ["A5:2017-Broken Access Control", "A01:2021-Broken Access Control"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Insecure temporary file"
+            },
+            "metavars": {
+                "$CALL": {
+                    "abstract_content": "open",
+                    "end": {
+                        "col": 10,
+                        "line": 26,
+                        "offset": 703
+                    },
+                    "start": {
+                        "col": 6,
+                        "line": 26,
+                        "offset": 699
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "utils/rsa-keygen.py",
+        "start": {
+            "col": 6,
+            "line": 26,
+            "offset": 699
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.tmpdir.python_tmpdir_rule-hardcodedtmp",
+        "end": {
+            "col": 33,
+            "line": 29,
+            "offset": 795
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "fa4996b5fc8179a5c9884d56edac9374015519c48bef7df73f10dc0044ec0d0e416e876ae99692b397c90ee2a3dab154247aa886688009e6ca362dd3f086a304_1",
+            "is_ignored": false,
+            "lines": "with open('/tmp/acme.pub', 'wb') as out:",
+            "message": "The application was found creating files in shared system temporary directories\n(`/tmp` or `/var/tmp`) without using the `tempfile.TemporaryFile` function. Depending\non how the application uses this temporary file, an attacker may be able to create\nsymlinks that point to other files prior to the application creating or writing\nto the target file, leading to unintended files being created or overwritten.\n\nExample using `tempfile.TemporaryFile` to write a file:\n```\nimport tempfile\n\n# Open a new temporary file using a context manager\nwith tempfile.TemporaryFile() as fp:\n    # Write some data to the temporary file\n    fp.write(b'Some data')\n    # Seek back to beginning of file\n    fp.seek(0)\n    # Read it\n    data = fp.read()\n# File is automatically closed/removed once we exit the with context\n```\n\nFor more information on alternative tempfile functions see:\n- https://docs.python.org/3/library/tempfile.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-377",
+                "owasp": ["A5:2017-Broken Access Control", "A01:2021-Broken Access Control"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Insecure temporary file"
+            },
+            "metavars": {
+                "$CALL": {
+                    "abstract_content": "open",
+                    "end": {
+                        "col": 10,
+                        "line": 29,
+                        "offset": 772
+                    },
+                    "start": {
+                        "col": 6,
+                        "line": 29,
+                        "offset": 768
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "utils/rsa-keygen.py",
+        "start": {
+            "col": 6,
+            "line": 29,
+            "offset": 768
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.tmpdir.python_tmpdir_rule-hardcodedtmp",
+        "end": {
+            "col": 33,
+            "line": 15,
+            "offset": 413
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "7ce47d8a0c644dc58a085ce1d166438196adb5bd0d64322c8e46cb65bd14e2a8bb2dee8c6a1665641248bd87032bdb7c871b8d660fb0c33f841278f6619b4982_0",
+            "is_ignored": false,
+            "lines": "with open(\"/tmp/acme.key\", \"rb\") as key_file:",
+            "message": "The application was found creating files in shared system temporary directories\n(`/tmp` or `/var/tmp`) without using the `tempfile.TemporaryFile` function. Depending\non how the application uses this temporary file, an attacker may be able to create\nsymlinks that point to other files prior to the application creating or writing\nto the target file, leading to unintended files being created or overwritten.\n\nExample using `tempfile.TemporaryFile` to write a file:\n```\nimport tempfile\n\n# Open a new temporary file using a context manager\nwith tempfile.TemporaryFile() as fp:\n    # Write some data to the temporary file\n    fp.write(b'Some data')\n    # Seek back to beginning of file\n    fp.seek(0)\n    # Read it\n    data = fp.read()\n# File is automatically closed/removed once we exit the with context\n```\n\nFor more information on alternative tempfile functions see:\n- https://docs.python.org/3/library/tempfile.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-377",
+                "owasp": ["A5:2017-Broken Access Control", "A01:2021-Broken Access Control"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Insecure temporary file"
+            },
+            "metavars": {
+                "$CALL": {
+                    "abstract_content": "open",
+                    "end": {
+                        "col": 10,
+                        "line": 15,
+                        "offset": 390
+                    },
+                    "start": {
+                        "col": 6,
+                        "line": 15,
+                        "offset": 386
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "utils/rsa-sign.py",
+        "start": {
+            "col": 6,
+            "line": 15,
+            "offset": 386
+        }
+    }, {
+        "check_id": "var.www.html.intrucept.sast-backend.scans.sast-rules.python.tmpdir.python_tmpdir_rule-hardcodedtmp",
+        "end": {
+            "col": 33,
+            "line": 16,
+            "offset": 443
+        },
+        "extra": {
+            "engine_kind": "OSS",
+            "fingerprint": "5b2c2543a8e6a02cf61adcb74b49faaef141187c1b0fc9925971396276001b927d86f6b3c78c98cb549e28ea4a7cef772368b15c9a6d986b0710c591f5feed73_0",
+            "is_ignored": false,
+            "lines": "with open(\"/tmp/acme.pub\", \"rb\") as key_file:",
+            "message": "The application was found creating files in shared system temporary directories\n(`/tmp` or `/var/tmp`) without using the `tempfile.TemporaryFile` function. Depending\non how the application uses this temporary file, an attacker may be able to create\nsymlinks that point to other files prior to the application creating or writing\nto the target file, leading to unintended files being created or overwritten.\n\nExample using `tempfile.TemporaryFile` to write a file:\n```\nimport tempfile\n\n# Open a new temporary file using a context manager\nwith tempfile.TemporaryFile() as fp:\n    # Write some data to the temporary file\n    fp.write(b'Some data')\n    # Seek back to beginning of file\n    fp.seek(0)\n    # Read it\n    data = fp.read()\n# File is automatically closed/removed once we exit the with context\n```\n\nFor more information on alternative tempfile functions see:\n- https://docs.python.org/3/library/tempfile.html\n",
+            "metadata": {
+                "category": "security",
+                "cwe": "CWE-377",
+                "owasp": ["A5:2017-Broken Access Control", "A01:2021-Broken Access Control"],
+                "security-severity": "MEDIUM",
+                "shortDescription": "Insecure temporary file"
+            },
+            "metavars": {
+                "$CALL": {
+                    "abstract_content": "open",
+                    "end": {
+                        "col": 10,
+                        "line": 16,
+                        "offset": 420
+                    },
+                    "start": {
+                        "col": 6,
+                        "line": 16,
+                        "offset": 416
+                    }
+                }
+            },
+            "severity": "WARNING",
+            "validation_state": "NO_VALIDATOR"
+        },
+        "path": "utils/rsa-verify.py",
+        "start": {
+            "col": 6,
+            "line": 16,
+            "offset": 416
+        }
+    }],
+    "skipped_rules": [],
+    "version": "1.57.0"
+}
