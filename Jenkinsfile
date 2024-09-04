@@ -60,7 +60,7 @@ pipeline {
 
                     // Output vulnerabilities and scan result
                     echo "Vulnerabilities found during SCA:"
-                    echo vulnsTable
+                    echo "${vulnsTable}"
                     env.CAN_PROCEED_SCA = canProceedSCA
                 }
             }
