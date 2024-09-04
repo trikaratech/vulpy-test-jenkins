@@ -58,9 +58,14 @@ pipeline {
                     def canProceedSCA = jsonResponse.canProceed
                     def vulnsTable = jsonResponse.vulnsTable
 
+
+                    // Remove ANSI color codes
+                    def cleanVulnsTable = vulnsTable.replaceAll(/\x1B\[[;0-9]*m/, '')
+
                     // Output vulnerabilities and scan result
                     echo "Vulnerabilities found during SCA:"
-                    echo "${vulnsTable}"
+                    echo "${cleanVulnsTable}"
+                   
                     env.CAN_PROCEED_SCA = canProceedSCA
                 }
             }
