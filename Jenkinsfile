@@ -40,7 +40,7 @@ pipeline {
                 // Create a second ZIP file for SAST scan (containing the project folder itself)
                 sh '''
                 mkdir tempFolder
-                cp -r . tempFolder/myproject
+                cp -r $(ls -A | grep -v tempFolder) tempFolder/myproject
                 cd tempFolder
                 zip -r ../projectSAST.zip myproject
                 cd ..
