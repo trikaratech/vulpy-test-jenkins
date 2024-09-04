@@ -104,7 +104,7 @@ pipeline {
                         curl -X POST \\
                         -H "Client-ID: $CLIENT_ID" \\
                         -H "Client-Secret: $CLIENT_SECRET" \\
-                        -F "projectZipFile=@projectSAST.zip" \\
+                        -F "projectZipFile=@projectSCA.zip" \\
                         -F "applicationId=$APPLICATION_ID" \\
                         -F "scanName=New SAST Scan from Jenkins Pipeline" \\
                         -F "language=python" \\
