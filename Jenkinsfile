@@ -39,14 +39,14 @@ pipeline {
 
                 // Create a second ZIP file for SAST scan (containing the project folder itself)
                 sh '''
-                rm -rf tempFolder
-                mkdir -p tempFolder/myproject
-                cp -r $(ls -A | grep -v tempFolder) tempFolder/myproject
-                cd tempFolder
-                zip -r ../projectSAST.zip myproject
-                cd ..
-                rm -rf tempFolder
-                '''
+                        rm -rf tempFolder
+                        mkdir -p tempFolder/myproject
+                        cp -r $(ls -A | grep -v tempFolder) tempFolder/myproject
+                        cd tempFolder
+                        zip -r ../projectSAST.zip myproject
+                        cd ..
+                        rm -rf tempFolder
+                    '''
             }
         }
 
