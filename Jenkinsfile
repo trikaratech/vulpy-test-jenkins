@@ -32,10 +32,20 @@ pipeline {
             }
         }
 
-        stage('Create ZIP File') {
+        stage('Create ZIP Files') {
             steps {
-                // Create a ZIP file of the project for SCA scan
-                sh 'zip -r project.zip . -x "*.git*"'
+                // Create a ZIP file of the project for SCA scan (containing only the project content)
+                sh 'zip -r projectSCA.zip . -x "*.git*"'
+
+                // Create a second ZIP file for SAST scan (containing the project folder itself)
+                sh '''
+                mkdir tempFolder
+                cp -r . tempFolder/myproject
+                cd tempFolder
+                zip -r ../projectSAST.zip myproject
+                cd ..
+                rm -rf tempFolder
+                '''
             }
         }
 
@@ -47,7 +57,7 @@ pipeline {
                         curl -X POST \\
                         -H "Client-ID: $CLIENT_ID" \\
                         -H "Client-Secret: $CLIENT_SECRET" \\
-                        -F "projectZipFile=@project.zip" \\
+                        -F "projectZipFile=@projectSCA.zip" \\
                         -F "applicationId=$APPLICATION_ID" \\
                         -F "scanName=New SCA Scan from Jenkins Pipeline" \\
                         -F "language=python" \\
@@ -58,14 +68,13 @@ pipeline {
                     def canProceedSCA = jsonResponse.canProceed
                     def vulnsTable = jsonResponse.vulnsTable
 
-
                     // Remove ANSI color codes
                     def cleanVulnsTable = vulnsTable.replaceAll(/\x1B\[[;0-9]*m/, '')
 
                     // Output vulnerabilities and scan result
                     echo "Vulnerabilities found during SCA:"
                     echo "${cleanVulnsTable}"
-                   
+
                     env.CAN_PROCEED_SCA = canProceedSCA
                 }
             }
@@ -92,7 +101,7 @@ pipeline {
                         curl -X POST \\
                         -H "Client-ID: $CLIENT_ID" \\
                         -H "Client-Secret: $CLIENT_SECRET" \\
-                        -F "projectZipFile=@project.zip" \\
+                        -F "projectZipFile=@projectSAST.zip" \\
                         -F "applicationId=$APPLICATION_ID" \\
                         -F "scanName=New SAST Scan from Jenkins Pipeline" \\
                         -F "language=python" \\
