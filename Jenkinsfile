@@ -33,22 +33,24 @@ pipeline {
         }
 
         stage('Create ZIP Files') {
-            steps {
-                // Create a ZIP file of the project for SCA scan (containing only the project content)
-                sh 'zip -r projectSCA.zip . -x "*.git*"'
+    steps {
+        script {
+            // Create projectSCA.zip (contains the content of the project)
+            sh 'zip -r projectSCA.zip . -x "*.git*"'
 
-                // Create a second ZIP file for SAST scan (containing the project folder itself)
-                sh '''
-                        rm -rf tempFolder
-                        mkdir -p tempFolder/myproject
-                        cp -r $(ls -A | grep -v tempFolder) tempFolder/myproject
-                        cd tempFolder
-                        zip -r ../projectSAST.zip myproject
-                        cd ..
-                        rm -rf tempFolder
-                    '''
-            }
+            // Create projectSAST.zip (contains the project in a 'myproject' folder)
+            sh '''
+                rm -rf tempFolder
+                mkdir -p tempFolder/myproject
+                cp -r $(ls -A | grep -v tempFolder) tempFolder/myproject/
+                cd tempFolder
+                zip -r ../projectSAST.zip myproject
+                cd ..
+                rm -rf tempFolder
+            '''
         }
+    }
+}
 
         stage('Perform SCA Scan') {
             steps {
