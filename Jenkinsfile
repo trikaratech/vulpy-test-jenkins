@@ -17,21 +17,6 @@ pipeline {
             }
         }
 
-        stage('Set Up Python') {
-            steps {
-                // Set up Python environment
-                sh 'python3 -m venv venv'
-                sh '. venv/bin/activate && pip install --upgrade pip'
-            }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                // Install project dependencies
-                sh '. venv/bin/activate && pip install -r requirements.txt'
-            }
-        }
-
         stage('Create ZIP Files') {
             steps {
                 script {
@@ -125,6 +110,21 @@ pipeline {
             steps {
                 // Fail the build if SAST scan did not pass
                 error "SAST scan failed. Deployment cancelled."
+            }
+        }
+
+        stage('Set Up Python') {
+            steps {
+                // Set up Python environment
+                sh 'python3 -m venv venv'
+                sh '. venv/bin/activate && pip install --upgrade pip'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                // Install project dependencies
+                sh '. venv/bin/activate && pip install -r requirements.txt'
             }
         }
 
