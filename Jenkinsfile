@@ -10,6 +10,18 @@ pipeline {
     }
 
     stages {
+        stage('Clean Up Old Files') {
+            steps {
+                script {
+                    // Clean up any previous directories or files
+                    // This ensures no old files or folders affect the new build
+                    sh 'rm -rf venv'
+                    sh 'rm -rf project.zip'
+                    sh 'rm -rf *'  // Optionally clean up everything in the workspace
+                }
+            }
+        }
+
         stage('Checkout Code') {
             steps {
                 // Checkout the code from the repository
@@ -20,8 +32,8 @@ pipeline {
         stage('Create ZIP Files') {
             steps {
                 script {
-                    // Create project.zip (contains the content of the project)
-                    sh 'zip -r project.zip . -x "*.git*"'
+                    // Create project.zip (contains the content of the project), excluding unwanted files
+                    sh 'zip -r project.zip . -x "*.git*" -x "venv/*"'
                 }
             }
         }
