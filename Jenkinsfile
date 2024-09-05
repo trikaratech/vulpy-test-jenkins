@@ -24,14 +24,14 @@ pipeline {
                 sh '. venv/bin/activate && pip install --upgrade pip'
             }
         }
-/*
+
         stage('Install Dependencies') {
             steps {
                 // Install project dependencies
                 sh '. venv/bin/activate && pip install -r requirements.txt'
             }
         }
-        */
+        
 
         stage('Create ZIP Files') {
     steps {
