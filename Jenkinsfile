@@ -42,7 +42,7 @@ pipeline {
     }
 }
 
-/*
+
         stage('Perform SCA Scan') {
             steps {
                 script {
@@ -86,9 +86,9 @@ pipeline {
         */
 
         stage('Perform SAST Scan') {
-           /* when {
+            when {
                 expression { return env.CAN_PROCEED_SCA == 'true' }
-            }*/
+            }
             steps {
                 script {
                     // Perform SAST scan using the API
