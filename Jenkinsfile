@@ -83,7 +83,7 @@ pipeline {
                 error "SCA scan failed. Deployment cancelled."
             }
         }
-        */
+        
 
         stage('Perform SAST Scan') {
             when {
