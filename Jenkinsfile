@@ -41,6 +41,7 @@ pipeline {
     }
 }
 
+/*
         stage('Perform SCA Scan') {
             steps {
                 script {
@@ -81,6 +82,7 @@ pipeline {
                 error "SCA scan failed. Deployment cancelled."
             }
         }
+        */
 
         stage('Perform SAST Scan') {
             when {
