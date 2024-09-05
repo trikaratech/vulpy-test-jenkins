@@ -31,45 +31,44 @@ pipeline {
                 sh '. venv/bin/activate && pip install -r requirements.txt'
             }
         }
-        
 
         stage('Create ZIP Files') {
-    steps {
-        script {
-            // Create projectSCA.zip (contains the content of the project)
-            sh 'zip -r project.zip . -x "*.git*"'           
+            steps {
+                script {
+                    // Create project.zip (contains the content of the project)
+                    sh 'zip -r project.zip . -x "*.git*"'
+                }
+            }
         }
-    }
-}
-
 
         stage('Perform SCA Scan') {
             steps {
                 script {
                     // Perform SCA scan using the API
                     def response = sh(script: '''
-                        curl -X POST \\
-                        -H "Client-ID: $CLIENT_ID" \\
-                        -H "Client-Secret: $CLIENT_SECRET" \\
+                        curl -v -X POST \\
+                        -H "Client-ID: ${env.CLIENT_ID}" \\
+                        -H "Client-Secret: ${env.CLIENT_SECRET}" \\
                         -F "projectZipFile=@project.zip" \\
-                        -F "applicationId=$APPLICATION_ID" \\
+                        -F "applicationId=${env.APPLICATION_ID}" \\
                         -F "scanName=New SCA Scan from Jenkins Pipeline" \\
                         -F "language=python" \\
-                        $SCA_API_URL
+                        ${env.SCA_API_URL}
                     ''', returnStdout: true).trim()
 
+                    echo "SCA API Response: ${response}"
                     def jsonResponse = readJSON(text: response)
                     def canProceedSCA = jsonResponse.canProceed
                     def vulnsTable = jsonResponse.vulnsTable
 
-                    // Remove ANSI color codes
+                    // Remove ANSI color codes (if any)
                     def cleanVulnsTable = vulnsTable.replaceAll(/\x1B\[[;0-9]*m/, '')
 
                     // Output vulnerabilities and scan result
                     echo "Vulnerabilities found during SCA:"
                     echo "${cleanVulnsTable}"
 
-                    env.CAN_PROCEED_SCA = canProceedSCA
+                    env.CAN_PROCEED_SCA = canProceedSCA.toString()
                 }
             }
         }
@@ -83,7 +82,6 @@ pipeline {
                 error "SCA scan failed. Deployment cancelled."
             }
         }
-        
 
         stage('Perform SAST Scan') {
             when {
@@ -93,28 +91,29 @@ pipeline {
                 script {
                     // Perform SAST scan using the API
                     def response = sh(script: '''
-                        curl -X POST \\
-                        -H "Client-ID: $CLIENT_ID" \\
-                        -H "Client-Secret: $CLIENT_SECRET" \\
+                        curl -v -X POST \\
+                        -H "Client-ID: ${env.CLIENT_ID}" \\
+                        -H "Client-Secret: ${env.CLIENT_SECRET}" \\
                         -F "projectZipFile=@project.zip" \\
-                        -F "applicationId=$APPLICATION_ID" \\
+                        -F "applicationId=${env.APPLICATION_ID}" \\
                         -F "scanName=New SAST Scan from Jenkins Pipeline" \\
                         -F "language=python" \\
-                        $SAST_API_URL
+                        ${env.SAST_API_URL}
                     ''', returnStdout: true).trim()
 
+                    echo "SAST API Response: ${response}"
                     def jsonResponse = readJSON(text: response)
-                    def canProceedSCA = jsonResponse.canProceed
+                    def canProceedSAST = jsonResponse.canProceed
                     def vulnsTable = jsonResponse.vulnsTable
 
-                    // Remove ANSI color codes
+                    // Remove ANSI color codes (if any)
                     def cleanVulnsTable = vulnsTable.replaceAll(/\x1B\[[;0-9]*m/, '')
 
                     // Output vulnerabilities and scan result
                     echo "Vulnerabilities found during SAST:"
                     echo "${cleanVulnsTable}"
 
-                    env.CAN_PROCEED_SAST = canProceedSAST
+                    env.CAN_PROCEED_SAST = canProceedSAST.toString()
                 }
             }
         }
