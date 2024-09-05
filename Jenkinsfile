@@ -40,37 +40,37 @@ pipeline {
         }
 
         stage('Perform SCA Scan') {
-            steps {
-                script {
-                    // Perform SCA scan using the API
-                    def response = sh(script: '''
-                        #!/bin/bash
-                        curl -v -X POST \\
-                        -H "Client-ID: ${env.CLIENT_ID}" \\
-                        -H "Client-Secret: ${env.CLIENT_SECRET}" \\
-                        -F "projectZipFile=@project.zip" \\
-                        -F "applicationId=${env.APPLICATION_ID}" \\
-                        -F "scanName=New SCA Scan from Jenkins Pipeline" \\
-                        -F "language=python" \\
-                        ${env.SCA_API_URL}
-                    ''', returnStdout: true).trim()
+    steps {
+        script {
+            // Perform SCA scan using the API
+            def response = sh(script: """
+                #!/bin/bash
+                curl -v -X POST \
+                -H "Client-ID: ${CLIENT_ID}" \
+                -H "Client-Secret: ${CLIENT_SECRET}" \
+                -F "projectZipFile=@project.zip" \
+                -F "applicationId=${APPLICATION_ID}" \
+                -F "scanName=New SCA Scan from Jenkins Pipeline" \
+                -F "language=python" \
+                "${SCA_API_URL}"
+            """, returnStdout: true).trim()
 
-                    echo "SCA API Response: ${response}"
-                    def jsonResponse = readJSON(text: response)
-                    def canProceedSCA = jsonResponse.canProceed
-                    def vulnsTable = jsonResponse.vulnsTable
+            echo "SCA API Response: ${response}"
+            def jsonResponse = readJSON(text: response)
+            def canProceedSCA = jsonResponse.canProceed
+            def vulnsTable = jsonResponse.vulnsTable
 
-                    // Remove ANSI color codes (if any)
-                    def cleanVulnsTable = vulnsTable.replaceAll(/\x1B\[[;0-9]*m/, '')
+            // Remove ANSI color codes (if any)
+            def cleanVulnsTable = vulnsTable.replaceAll(/\x1B\[[;0-9]*m/, '')
 
-                    // Output vulnerabilities and scan result
-                    echo "Vulnerabilities found during SCA:"
-                    echo "${cleanVulnsTable}"
+            // Output vulnerabilities and scan result
+            echo "Vulnerabilities found during SCA:"
+            echo "${cleanVulnsTable}"
 
-                    env.CAN_PROCEED_SCA = canProceedSCA.toString()
-                }
-            }
+            env.CAN_PROCEED_SCA = canProceedSCA.toString()
         }
+    }
+}
 
         stage('Check SCA Result') {
             when {
@@ -83,40 +83,40 @@ pipeline {
         }
 
         stage('Perform SAST Scan') {
-            when {
-                expression { return env.CAN_PROCEED_SCA == 'true' }
-            }
-            steps {
-                script {
-                    // Perform SAST scan using the API
-                    def response = sh(script: '''
-                        #!/bin/bash
-                        curl -v -X POST \\
-                        -H "Client-ID: ${env.CLIENT_ID}" \\
-                        -H "Client-Secret: ${env.CLIENT_SECRET}" \\
-                        -F "projectZipFile=@project.zip" \\
-                        -F "applicationId=${env.APPLICATION_ID}" \\
-                        -F "scanName=New SAST Scan from Jenkins Pipeline" \\
-                        -F "language=python" \\
-                        ${env.SAST_API_URL}
-                    ''', returnStdout: true).trim()
+    when {
+        expression { return env.CAN_PROCEED_SCA == 'true' }
+    }
+    steps {
+        script {
+            // Perform SAST scan using the API
+            def response = sh(script: """
+                #!/bin/bash
+                curl -v -X POST \
+                -H "Client-ID: ${CLIENT_ID}" \
+                -H "Client-Secret: ${CLIENT_SECRET}" \
+                -F "projectZipFile=@project.zip" \
+                -F "applicationId=${APPLICATION_ID}" \
+                -F "scanName=New SAST Scan from Jenkins Pipeline" \
+                -F "language=python" \
+                "${SAST_API_URL}"
+            """, returnStdout: true).trim()
 
-                    echo "SAST API Response: ${response}"
-                    def jsonResponse = readJSON(text: response)
-                    def canProceedSAST = jsonResponse.canProceed
-                    def vulnsTable = jsonResponse.vulnsTable
+            echo "SAST API Response: ${response}"
+            def jsonResponse = readJSON(text: response)
+            def canProceedSAST = jsonResponse.canProceed
+            def vulnsTable = jsonResponse.vulnsTable
 
-                    // Remove ANSI color codes (if any)
-                    def cleanVulnsTable = vulnsTable.replaceAll(/\x1B\[[;0-9]*m/, '')
+            // Remove ANSI color codes (if any)
+            def cleanVulnsTable = vulnsTable.replaceAll(/\x1B\[[;0-9]*m/, '')
 
-                    // Output vulnerabilities and scan result
-                    echo "Vulnerabilities found during SAST:"
-                    echo "${cleanVulnsTable}"
+            // Output vulnerabilities and scan result
+            echo "Vulnerabilities found during SAST:"
+            echo "${cleanVulnsTable}"
 
-                    env.CAN_PROCEED_SAST = canProceedSAST.toString()
-                }
-            }
+            env.CAN_PROCEED_SAST = canProceedSAST.toString()
         }
+    }
+}
 
         stage('Check SAST Result') {
             when {
