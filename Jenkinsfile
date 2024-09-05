@@ -33,8 +33,14 @@ pipeline {
         stage('Create ZIP Files') {
             steps {
                 script {
-                    // Create project.zip (contains the content of the project), excluding unwanted files
-                    sh 'zip -r project.zip . -x "*.git*" -x "venv/*"'
+                    // Create a new folder
+                    sh 'mkdir project_folder'
+                    
+                    // Move all files and directories (except .git and venv) to the new folder
+                    sh 'find . -maxdepth 1 -not -name "." -not -name ".." -not -name ".git" -not -name "venv" -not -name "project_folder" -exec mv {} project_folder/ \\;'
+                    
+                    // Create project.zip from the new folder
+                    sh 'zip -r project.zip project_folder'
                 }
             }
         }
@@ -55,7 +61,6 @@ pipeline {
                 "${SCA_API_URL}"
             """, returnStdout: true).trim()
 
-            echo "SCA API Response: ${response}"
             def jsonResponse = readJSON(text: response)
             def canProceedSCA = jsonResponse.canProceed
             def vulnsTable = jsonResponse.vulnsTable
@@ -101,7 +106,6 @@ pipeline {
                 "${SAST_API_URL}"
             """, returnStdout: true).trim()
 
-            echo "SAST API Response: ${response}"
             def jsonResponse = readJSON(text: response)
             def canProceedSAST = jsonResponse.canProceed
             def vulnsTable = jsonResponse.vulnsTable
