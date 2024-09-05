@@ -10,6 +10,19 @@ pipeline {
     }
 
     stages {
+        stage('Clean Up Old Files') {
+            steps {
+                script {
+                    // Clean up any previous directories or files
+                    sh 'rm -rf venv'
+                    sh 'rm -rf project.zip'
+                    sh 'rm -rf *.json'
+                    sh 'rm -rf *.csv'
+                    sh 'rm -rf *.sh'
+                }
+            }
+        }
+
         stage('Checkout Code') {
             steps {
                 // Checkout the code from the repository
@@ -20,8 +33,8 @@ pipeline {
         stage('Create ZIP Files') {
             steps {
                 script {
-                    // Create project.zip (contains the content of the project)
-                    sh 'zip -r project.zip . -x "*.git*"'
+                    // Create project.zip (contains the content of the project), excluding unwanted files
+                    sh 'zip -r project.zip . -x "*.git*" -x "venv/*"'
                 }
             }
         }
@@ -31,6 +44,7 @@ pipeline {
                 script {
                     // Perform SCA scan using the API
                     def response = sh(script: '''
+                        #!/bin/bash
                         curl -v -X POST \\
                         -H "Client-ID: ${env.CLIENT_ID}" \\
                         -H "Client-Secret: ${env.CLIENT_SECRET}" \\
@@ -76,6 +90,7 @@ pipeline {
                 script {
                     // Perform SAST scan using the API
                     def response = sh(script: '''
+                        #!/bin/bash
                         curl -v -X POST \\
                         -H "Client-ID: ${env.CLIENT_ID}" \\
                         -H "Client-Secret: ${env.CLIENT_SECRET}" \\
