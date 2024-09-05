@@ -36,18 +36,7 @@ pipeline {
     steps {
         script {
             // Create projectSCA.zip (contains the content of the project)
-            sh 'zip -r projectSCA.zip . -x "*.git*"'
-
-            // Create projectSAST.zip (contains the project in a 'myproject' folder)
-            sh '''
-                rm -rf tempFolder
-                mkdir -p tempFolder/myproject
-                cp -r $(ls -A | grep -v tempFolder) tempFolder/myproject/
-                cd tempFolder
-                zip -r ../projectSAST.zip myproject
-                cd ..
-                rm -rf tempFolder
-            '''
+            sh 'zip -r project.zip . -x "*.git*"'           
         }
     }
 }
@@ -60,7 +49,7 @@ pipeline {
                         curl -X POST \\
                         -H "Client-ID: $CLIENT_ID" \\
                         -H "Client-Secret: $CLIENT_SECRET" \\
-                        -F "projectZipFile=@projectSCA.zip" \\
+                        -F "projectZipFile=@project.zip" \\
                         -F "applicationId=$APPLICATION_ID" \\
                         -F "scanName=New SCA Scan from Jenkins Pipeline" \\
                         -F "language=python" \\
@@ -104,7 +93,7 @@ pipeline {
                         curl -X POST \\
                         -H "Client-ID: $CLIENT_ID" \\
                         -H "Client-Secret: $CLIENT_SECRET" \\
-                        -F "projectZipFile=@projectSCA.zip" \\
+                        -F "projectZipFile=@project.zip" \\
                         -F "applicationId=$APPLICATION_ID" \\
                         -F "scanName=New SAST Scan from Jenkins Pipeline" \\
                         -F "language=python" \\
@@ -112,12 +101,16 @@ pipeline {
                     ''', returnStdout: true).trim()
 
                     def jsonResponse = readJSON(text: response)
-                    def canProceedSAST = jsonResponse.canProceed
-                    def vulnsTableSAST = jsonResponse.vulnsTable
+                    def canProceedSCA = jsonResponse.canProceed
+                    def vulnsTable = jsonResponse.vulnsTable
+
+                    // Remove ANSI color codes
+                    def cleanVulnsTable = vulnsTable.replaceAll(/\x1B\[[;0-9]*m/, '')
 
                     // Output vulnerabilities and scan result
                     echo "Vulnerabilities found during SAST:"
-                    echo vulnsTableSAST
+                    echo "${cleanVulnsTable}"
+
                     env.CAN_PROCEED_SAST = canProceedSAST
                 }
             }
