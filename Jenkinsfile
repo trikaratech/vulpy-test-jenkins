@@ -34,6 +34,7 @@ pipeline {
             steps {
                 script {
                     // Create a new folder
+                    sh 'rm -rf project_folder'
                     sh 'mkdir project_folder'
                     
                     // Move all files and directories (except .git and venv) to the new folder
